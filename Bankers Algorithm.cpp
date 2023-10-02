@@ -7,27 +7,27 @@
 
 int main()
 {
-	freopen("input.txt", "r", stdin); 
+    freopen("input.txt", "r", stdin); 
     freopen("output.txt", "w", stdout);
 
     int processSize = 5, resourceSize = 3 ,flag,index = 0;
     int sequence[processSize],finish[processSize]={0},need[processSize][resourceSize];
 
     int allocated[processSize][resourceSize] = { 
-								    	          { 0, 1, 0 },
-												  { 2, 0, 0 },
-												  { 3, 0, 2 },
-												  { 2, 1, 1 },
-												  { 0, 0, 2 } 
-										       };
+				                { 0, 1, 0 },
+					        { 2, 0, 0 },
+					        { 3, 0, 2 },
+					        { 2, 1, 1 },
+					        { 0, 0, 2 } 
+					       };
 
     int maximum[processSize][resourceSize] = { 
-								    	        { 7, 5, 3 },
-												{ 3, 2, 2 },
-												{ 9, 0, 2 },
-												{ 2, 2, 2 },
-												{ 4, 3, 3 } 
-											 };
+					      { 7, 5, 3 },
+					      { 3, 2, 2 },
+					      { 9, 0, 2 },
+					      { 2, 2, 2 },
+					      { 4, 3, 3 }
+                                             };
 
     int available[resourceSize] = { 3, 3, 2 };
 
