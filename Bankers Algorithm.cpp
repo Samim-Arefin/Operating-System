@@ -1,75 +1,92 @@
+/*
+ *  Problem : Bankers Algorithm.cpp
+ *  Created by Samim Arefin
+*/
+
 #include <bits/stdc++.h>
-using namespace std;
 
 int main()
 {
-	int n, m, i, j, k;
-	n = 5;
-	m = 3;
-	int alloc[5][3] = { { 0, 1, 0 },
-						{ 2, 0, 0 },
-						{ 3, 0, 2 },
-						{ 2, 1, 1 },
-						{ 0, 0, 2 } };
+	freopen("input.txt", "r", stdin); 
+    freopen("output.txt", "w", stdout);
 
-	int max[5][3] = { { 7, 5, 3 },
-					{ 3, 2, 2 },
-					{ 9, 0, 2 },
-					{ 2, 2, 2 },
-					{ 4, 3, 3 } };
+    int processSize = 5, resourceSize = 3 ,flag,index = 0;
+    int sequence[processSize],finish[processSize]={0},need[processSize][resourceSize];
 
-	int avail[3] = { 3, 3, 2 };
+    int allocated[processSize][resourceSize] = { 
+								    	          { 0, 1, 0 },
+												  { 2, 0, 0 },
+												  { 3, 0, 2 },
+												  { 2, 1, 1 },
+												  { 0, 0, 2 } 
+										       };
 
-	int f[5], ans[5], ind = 0;
-	for (k = 0; k < n; k++) {
-		f[k] = 0;
-	}
-	int need[5][3];
-	for (i = 0; i < n; i++) {
-		for (j = 0; j < m; j++)
-			need[i][j] = max[i][j] - alloc[i][j];
-	}
-	int y = 0;
-	for (k = 0; k < 5; k++) {
-		for (i = 0; i < n; i++) {
-			if (f[i] == 0) {
+    int maximum[processSize][resourceSize] = { 
+								    	        { 7, 5, 3 },
+												{ 3, 2, 2 },
+												{ 9, 0, 2 },
+												{ 2, 2, 2 },
+												{ 4, 3, 3 } 
+											 };
 
-				int flag = 0;
-				for (j = 0; j < m; j++) {
-					if (need[i][j] > avail[j]) {
-						flag = 1;
-						break;
-					}
-				}
+    int available[resourceSize] = { 3, 3, 2 };
 
-				if (flag == 0) {
-					ans[ind++] = i;
-					for (y = 0; y < m; y++)
-						avail[y] += alloc[i][y];
-					f[i] = 1;
-				}
-			}
-		}
-	}
+    for(int i = 0; i<processSize; i++)
+    {
+    	for(int j = 0; j < resourceSize; j++)
+    	{
+    		need[i][j] = maximum[i][j]-allocated[i][j];
+    	}
+    }
+   
+    
+    for(int i = 0; i < processSize; i++)
+    {
+    	flag = 0;
+    	if(finish[i] == 0)
+    	{
+    		for(int j = 0; j < resourceSize; j++)
+    		{
+    			if(need[i][j] > available[j])
+    			{
+    				flag = 1;
+    				break;
+    			}
+    		}
+            
+            if(flag == 0)
+            {
+                finish[i] = 1;
+                sequence[index++] = i;
+                for(int j = 0; j<resourceSize;j++)
+                {
+                    available[j] += allocated[i][j];
+                }
+                if(i == processSize-1)
+                {
+                   i = -1;
+                }
+            }
+    	}
+    }
 
-	int flag = 1;
+    bool check = true;
+    for(int i = 0; i<processSize;i++)
+    {
+        if(finish[i] == 0)
+        {
+           check = false;
+           std::cout << "The given sequence is not safe";
+		   break;
+        }
+    }
 
-	for (int i = 0; i < n; i++)
-	{
-		if (f[i] == 0)
-		{
-			flag = 0;
-			std::cout << "The given sequence is not safe";
-			break;
-		}
-	}
-
-	if (flag == 1)
-	{
-		std::cout << "Following is the SAFE Sequence" <<'\n';
-		for (i = 0; i < n - 1; i++)
-			std::cout << " P" << ans[i] << " ->";
-		std::cout << " P" << ans[n - 1] << '\n';
-	}
-
+    if(check)
+    {
+       for(int i = 0; i<processSize;i++)
+       {
+          std::cout<<"P"<<sequence[i]<<" ";
+       }
+       std::cout<<'\n';
+    }
 }

@@ -1,78 +1,112 @@
-#include<bits/stdc++.h>
-#include<algorithm>
+/*
+ *  Problem : Shortest Job First.cpp
+ *  Created by Samim Arefin
+*/
 
-using namespace std;
-int main() {
+#include <bits/stdc++.h>
 
-    int n;
-    std::cout << "Enter the number of Process : ";
-    std::cin >> n;
-    int pid[100], at[100], bt[100], ct[100], tat[100], wt[100];
+class processor{
+public:
+    int index;
+    int AT;
+    int BT;
+    int CT;
+    int TAT;
+    int WT;
+    std::string name;
+    bool isComplete = false;
+};
 
-    for (int i = 0; i < n; i++) 
-    {
-        std::cout << "Enter Arival & Burst Time : ";
-        std::cin >> at[i] >> bt[i];
-    }
+void CalculateCT(std::vector<processor>& processorList)
+{
+     processorList[0].CT = processorList[0].AT + processorList[0].BT;
+     processorList[0].isComplete = true;
 
-    priority_queue<pair<int, pair<int, int>>> pqu;
-
-    int last_arrive = 0;
-    while (at[last_arrive] <= at[0]) 
-    {
-        pqu.push({ -bt[last_arrive],{at[last_arrive],last_arrive} });
-        last_arrive++;
-    }
-
-    int pre_com = pqu.top().second.second;
-    ct[pre_com] = pqu.top().second.first + (-pqu.top().first);
-    pqu.pop();
-
-    for (int i = 1; i < n; i++) 
-    {
-        while (last_arrive < n && at[last_arrive] <= ct[pre_com]) 
+     for(int i = 1; i<processorList.size();i++)
+     {
+        std::vector<processor>Temporary_ProcessorList;
+        int CT = processorList[i-1].CT;
+        for(int j = 0; j<processorList.size();j++)
         {
-            pqu.push({ -bt[last_arrive],{at[last_arrive],last_arrive} });
-            last_arrive++;
+           if(!processorList[j].isComplete && processorList[j].AT <= CT)
+           {
+               Temporary_ProcessorList.push_back(processorList[j]);
+           }
         }
-        if (pqu.empty()) 
+
+        std::sort(Temporary_ProcessorList.begin(),Temporary_ProcessorList.end(), [](processor a, processor b)
         {
-            if (last_arrive < n) 
+            if(a.BT == b.BT)
             {
-                pqu.push({ -bt[last_arrive],{at[last_arrive],last_arrive} });
-                last_arrive++;
+               return a.AT<b.AT;
             }
-            else 
+            else
             {
-                break;
+               return a.BT<b.BT;
             }
+        });
+
+        for(int j = 0 , k = i; j < Temporary_ProcessorList.size(); j++)
+        {
+            processorList[k++] = Temporary_ProcessorList[j];
         }
-        int cur_com = pqu.top().second.second;
-        ct[cur_com] = max(ct[pre_com], pqu.top().second.first) + (-pqu.top().first);
-        pre_com = cur_com;
-        pqu.pop();
-    }
+        processorList[i].isComplete = true;
+        processorList[i].CT = processorList[i-1].CT > processorList[i].AT
+     	                      ? processorList[i-1].CT + processorList[i].BT
+     	                      : processorList[i].AT+ processorList[i].BT;
+     }
 
+}
 
-    int ttat = 0, twt = 0;
+void Calculate_TAT_AND_WT(std::vector<processor>& processorList)
+{
 
-    for (int i = 0; i < n; i++) 
+    for(auto& processor: processorList)
     {
-        tat[i] = ct[i] - at[i];
-        ttat += tat[i];
-        wt[i] = tat[i] - bt[i];
-        twt += wt[i];
+        processor.TAT = processor.CT - processor.AT;
+        processor.WT = processor.TAT - processor.BT;
     }
+}
 
-    std::cout << "AT" << '\t' << "BT" << '\t' << "CT" << '\t' << "TAT" << '\t' << "WT\n";
-    for (int i = 0; i < n; i++) 
-    {
-        cout << at[i] << '\t' << bt[i] << '\t' << ct[i] << '\t' << tat[i] << '\t' << wt[i] << '\n';
-    }
-    cout << '\n';
-    cout << "Total : " << "\t\t" << ttat << '\t' << twt << '\n';
+void SJF(std::vector<processor>& processorList)
+{
+   std::sort(processorList.begin(), processorList.end(), [](processor a, processor b)
+        {
+            return a.AT<b.AT;
+        });
 
-    cout << "Average Tarn Around Time : " << ttat / (n + 0.0) << '\n';
-    cout << "Average Waiting Time : " << twt / (n + 0.0) << '\n';
-    return 0;
+    CalculateCT(processorList);
+    Calculate_TAT_AND_WT(processorList);
+
+    std::sort(processorList.begin(), processorList.end(), [](processor a, processor b)
+        {
+            return a.index<b.index;
+        });
+}
+
+
+int main()
+{
+	freopen("input.txt", "r", stdin); 
+    freopen("output.txt", "w", stdout);
+    
+
+   int processSize;
+   std::cin>>processSize;
+
+   std::vector<processor> processorList(processSize);
+
+   for(int i = 0; i<processSize;i++)
+   {
+       std::cin>>processorList[i].name>>processorList[i].AT>>processorList[i].BT;
+       processorList[i].index = i;
+   }
+   
+   SJF(processorList);
+
+   std::cout<<"Name\t AT\t BT\t CT\t TAT\t WT\n";
+   for(auto processor : processorList)
+   {
+      std::cout<<processor.name<<'\t'<<processor.AT<<'\t'<<processor.BT<<'\t'<<processor.CT<<'\t'<<processor.TAT<<'\t'<<processor.WT<<'\n';
+   }
 }

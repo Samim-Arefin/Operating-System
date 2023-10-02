@@ -1,60 +1,69 @@
-#include<bits/stdc++.h>
-using namespace std;
+/*
+ *  Problem : Bounded And Buffer.cpp
+ *  Created by Samim Arefin
+*/
 
-int Mutex = 1;
-int full = 0;
-int Empty = 100, x = 0;
+#include <bits/stdc++.h>
+
+int lock = 1, capacity = 100, fill = 0, product = 0;
 
 void producer()
 {
-	--Mutex;
-	++full;
-	--Empty;
-	x++;
-	std::cout << "\nProducer produces item " << x;
-	++Mutex;
+	--lock;
+	--capacity;
+	++fill;
+	++product;
+	std::cout<<"Producer produces product "<<product<<'\n';
+	++lock;
 }
 
 void consumer()
 {
-	--Mutex;
-	--full;
-	++Empty;
-	std::cout << "\nConsumer consumes item " << x;
-	x--;
-	++Mutex;
+	--lock;
+	++capacity;
+	--fill;
+	std::cout<<"Consumer consumes product "<<product<<'\n';
+	--product;
+	++lock;
 }
 
 int main()
 {
-	int n;
-	std::cout << "\n1.Producer\n2.Consumer\n3.Exit";
-	for (int i = 1; i > 0; i++) {
+	freopen("input.txt", "r", stdin);
+    freopen("output.txt", "w", stdout);
 
-		std::cout << "\n\nEnter Choice:";
-		std::cin >> n;
+    while(true)
+    {
+        int choice;
+        std::cin>>choice;
+        switch(choice)
+        {
+        	case 1:
+	        	if (lock == 1 && capacity != 0)
+	        	{
+	        		producer();
+	        	}
+	        	else
+	        	{
+                    std::cout<<"Buffer is full!\n";
+	        	}
+	        	break;
+	        case 2:
+	        	if (lock == 1 && fill != 0)
+	        	{
+	        		consumer();
+	        	}
+	        	else
+	        	{
+                    std::cout<<"Buffer is empty\n";
+	        	}
+	        	break;
+	        case 3:
+	            exit(0);
 
-		switch (n) {
-		case 1:
-			if ((Mutex == 1) && (Empty != 0)) {
-				producer();
-			}
-			else {
-				std::cout << "Buffer is full!";
-			}
-			break;
-
-		case 2:
-			if ((Mutex == 1) && (full != 0)) {
-				consumer();
-			}
-			else {
-				std::cout << "Buffer is empty!";
-			}
-			break;
-		case 3:
-			exit(0);
-			break;
-		}
-	}
+	        default:
+	            std::cout<<"Wrong Choice. Try again !!\n";
+	            break;
+        }
+    }
 }
